@@ -9,6 +9,8 @@
 plugins {
     // Apply the java-library plugin to add support for Java Library
     id 'java-library'
+    id 'maven'
+    id 'signing'
 }
 
 dependencies {
@@ -22,9 +24,75 @@ dependencies {
     testImplementation 'junit:junit:4.12'
 }
 
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+group = "com.yoshikimoji.oss"
+archivesBaseName = "phonecode"
+version = "1.0.0"
+
 // In this section you declare where to find the dependencies of your project
 repositories {
     // Use jcenter for resolving your dependencies.
     // You can declare any Maven/Ivy/file repository here.
     jcenter()
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            pom.project {
+                name 'Java chinese phone code to area code convert'
+                packaging 'jar'
+                // optionally artifactId can be defined here
+                description 'This is a library to convert chinese phone code to area code or vice versa'
+                url 'https://github.com/netroby/java-cn-phone-area-code'
+
+                scm {
+                    connection 'scm:git:https://github.com/netroby/java-cn-phone-area-code.git'
+                    developerConnection 'scm:svn:https://github.com/netroby/java-cn-phone-area-code'
+                    url 'https://github.com/netroby/java-cn-phone-area-code'
+                }
+
+                licenses {
+                    license {
+                        name 'The Apache License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'netroby'
+                        name 'ZhiFeng Hu'
+                        email 'hufeng1987@gmail.com'
+                    }
+                }
+            }
+        }
+    }
 }
