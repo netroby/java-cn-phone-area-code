@@ -24,6 +24,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
 }
 
+
 task javadocJar(type: Jar) {
     classifier = 'javadoc'
     from javadoc
@@ -43,7 +44,7 @@ signing {
 
 group = "com.yoshikimoji.oss"
 archivesBaseName = "phonecode"
-version = "1.0.0"
+version = "1.0.1"
 
 // In this section you declare where to find the dependencies of your project
 repositories {
@@ -95,4 +96,13 @@ uploadArchives {
             }
         }
     }
+}
+
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
+javadoc {
+    options.addStringOption('encoding', 'UTF-8')
 }
